@@ -6,8 +6,13 @@ It was designed for a minimum number of queries to the database.
 
 For now, support only Mongoid 3.
 
-* Propagate only when needed
-* Take advantage of atomic operations on multi documents of MongoDB
+* Denormalize fields
+* Denormalize methods (only in One to Many situations for now)
+* Denormalize `count` in Many to One situations
+* Propagate only when needed:
+    * for fields: when there are actual changes
+    * for methods: always (we can't know in an inexpensive way what is the old value to figure out if there is a change)
+* Take advantage of atomic operations on multiple documents of MongoDB
 
 *This is a pre-version not suitable for production.*
 
@@ -34,6 +39,13 @@ Add `include Mongoid::Max::Denormalize` in your model and also:
     denormalize relation, field_1, field_2 ... field_n, options
 
 
+### Warming up
+
+If there are existing records prior to the denormalization setup, you have to warm up. See below for each relation type.
+
+Note: you can't warm up from both sides of the relation. Only the most efficient is available.
+
+
 ### One to Many
 
 **Supported fields:** normal Mongoid fields, and methods.
@@ -58,7 +70,7 @@ Example :
       include Mongoid::Document
       include Mongoid::Max::Denormalize
 
-      belons_to :post
+      belongs_to :post
       denormalize :post, :title, :slug
     end
 
@@ -71,6 +83,10 @@ Example :
     @comment.reload     # to reload the comment from the DB
     @comment.post_title #=> "All Must Share The Burden"
     @comment.post_slug  #=> "all-must-share-the-burden"
+
+To warm up the denormalization for an existing collection:
+
+    Post.denormalize_to_comments!
 
 **Tips :** In your views, do not use `@comment.post` but `@comment.post_id` or `@comment.post_id?`
 to avoid a query that checks/retrieve for the post. We want to avoid it, don't we ?
@@ -116,7 +132,7 @@ Example :
     class Comment
       include Mongoid::Document
 
-      belons_to :post
+      belongs_to :post
 
       field :rating
       field :stuff
@@ -130,15 +146,29 @@ Example :
     @post.comments_rating #=> [5, 3]
     @post.comments_stuff  #=> ["A", "B"]
 
-You can see that each denormalized field in stored in a separate array. This is wanted.
-An option `:group` will come to allow :
+To warm up the denormalization for an existing collection:
 
-    @post.comments_fields #=> [{:rating => 5, :stuff => "A"},{:rating => 5, :stuff => "B"}]
+    Post.denormalize_from_comments!
+
+You can see that each denormalized field in stored in a separate array. This is wanted.
+An option `:group` will come to allow the way below (and maybe permit methods denormalization) :
+
+    @post.comments_fields #=> [{:rating => 5, :stuff => "A"}, {:rating => 5, :stuff => "B"}]
 
 
 ### Many to One
 
 To come...
+
+
+
+## Planned
+
+* Support for Many to Many
+* Support for `:group` option in Many to One
+* Support for methods denormalization in Many to One (depends on `:group` option)
+* Support for `:sum` and `:mean` options in Many to One
+* Support for `:touch` option to "touch" an `updated_at` field (for cache purpose)
 
 
 
