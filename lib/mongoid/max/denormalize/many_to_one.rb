@@ -104,8 +104,7 @@ EOM
               yield if block_given?
               return if changed_fields.empty?
 
-              to_update = { "$set" => {}, "$inc" => {} }
-              to_push = {}
+              to_update = { "$set" => {}, "$inc" => {}, "$push" => {} }
               to_get = {}
 
               to_rem_fields = to_rem.reject {|k,v| v.nil?}.keys
@@ -113,7 +112,7 @@ EOM
 
               # Those to add only
               (to_add_only_fields = to_add_fields - to_rem_fields).each do |field|
-                to_push[field] = to_add[field]
+                to_update["$push"][field] = to_add[field]
               end
 
               to_set_fields = (to_add_fields + to_rem_fields - to_add_only_fields).uniq
@@ -140,8 +139,6 @@ EOM
 
               to_update.reject! {|k,v| v.empty?}
               #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
-
-              #{klass}.collection.find(:_id => remote_id).update_all({"$push" => to_push}) unless to_push.empty?
             end
 
             def denormalize_to_#{inverse_relation}_old
@@ -154,7 +151,7 @@ EOM
                 to_rem[:"#{relation}_\#{field}"] = send(:"\#{field}_was")
               end
 
-              to_update = { "$set" => {}, "$inc" => {} }
+              to_update = { "$set" => {}, "$inc" => {}, "$push" => {} }
               to_get = {}
 
               to_rem_fields = to_rem.reject {|k,v| v.nil?}.keys
@@ -197,8 +194,7 @@ EOM
 
               yield if block_given?
 
-              to_update = { "$set" => {}, "$inc" => {} }
-              to_push = {}
+              to_update = { "$set" => {}, "$inc" => {}, "$push" => {} }
               to_get = {}
 
               to_rem_fields = to_rem.reject {|k,v| v.nil?}.keys

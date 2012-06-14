@@ -9,6 +9,7 @@ class Rating
 
   field :note, type: Integer
   field :comment, type: String
+  field :upset_level, type: Integer
 
   belongs_to :song
 end
@@ -20,7 +21,7 @@ class Song
   has_many :ratings
 
   #denormalize :ratings, :note, :comment, count: true, mean: [:note]
-  denormalize :ratings, :note, :comment, count: true
+  denormalize :ratings, :note, :comment, :upset_level, count: true
 end
 
 
@@ -56,12 +57,12 @@ describe "Case: a song and his ratings" do
       its(:ratings_count) { should eq 1 }
       its(:ratings_note) { should eq [5] }
       its(:ratings_comment) { should eq ["Good!"] }
-
-#      its(:ratings_mean) { should eq 5 }
+      its(:ratings_upset_level) { should eq [] }
 
       context "when modifing the first rating (=4)" do
         before do
           @rating.note = 4
+          @rating.upset_level = 0
           @rating.save!
           @song.reload
         end
@@ -70,6 +71,7 @@ describe "Case: a song and his ratings" do
         its(:ratings_count) { should eq 1 }
         its(:ratings_note) { should eq [4] }
         its(:ratings_comment) { should eq ["Good!"] }
+        its(:ratings_upset_level) { should eq [0] }
       end
 
       context "when adding an other rating (=5)" do
