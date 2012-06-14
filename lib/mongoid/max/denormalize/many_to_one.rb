@@ -102,7 +102,7 @@ EOM
               end
 
               yield if block_given?
-              return if changed_fields.empty?
+              return if (changed_fields.empty? && !fields.empty?)
 
               to_update = { "$set" => {}, "$inc" => {}, "$push" => {} }
               to_get = {}
