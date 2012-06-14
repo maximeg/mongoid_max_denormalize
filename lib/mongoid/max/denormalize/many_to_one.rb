@@ -14,6 +14,9 @@ module Mongoid
         end
 
         def attach
+          #
+          # This side of the relation
+          #
           fields_only.each do |field|
             klass.field "#{relation}_#{field}", type: Array, default: []
           end
@@ -22,9 +25,9 @@ module Mongoid
             klass.field "#{relation}_count", type: Integer, default: 0
           end
 
-          klass.class_eval <<-EOM, __FILE__, __LINE__
-            before_create :denormalize_from_#{relation}
+          klass.before_create :"denormalize_from_#{relation}"
 
+          klass.class_eval <<-EOM, __FILE__, __LINE__
             def denormalize_from_#{relation}(force=false)
               #{relation}_retrieved = nil
 
@@ -44,7 +47,9 @@ module Mongoid
 
               true
             end
+          EOM
 
+          klass.class_eval <<-EOM, __FILE__, __LINE__
             def self.denormalize_from_#{relation}!
               each do |obj|
                 obj.denormalize_from_#{relation}(true)
@@ -55,9 +60,12 @@ module Mongoid
             end
           EOM
 
-          meta.klass.class_eval <<-EOM, __FILE__, __LINE__
-            around_save :denormalize_to_#{inverse_relation}
+          #
+          # Other side of the relation
+          #
+          inverse_klass.around_save :"denormalize_to_#{inverse_relation}"
 
+          inverse_klass.class_eval <<-EOM, __FILE__, __LINE__
             def denormalize_to_#{inverse_relation}
               if !changed? && !new_record?
                 yield if block_given?
@@ -145,7 +153,9 @@ module Mongoid
               to_update.reject! {|k,v| v.empty?}
               #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
             end
+          EOM
 
+          inverse_klass.class_eval <<-EOM, __FILE__, __LINE__
             def denormalize_to_#{inverse_relation}_old
               fields = [#{Base.array_code_for(fields_only)}]
 
@@ -182,11 +192,12 @@ module Mongoid
               to_update.reject! {|k,v| v.empty?}
               #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
             end
+          EOM
 
 
+          inverse_klass.around_destroy :"denormalize_to_#{inverse_relation}_destroy"
 
-            around_destroy :denormalize_to_#{inverse_relation}_destroy
-
+          inverse_klass.class_eval <<-EOM, __FILE__, __LINE__
             def denormalize_to_#{inverse_relation}_destroy
               fields = [#{Base.array_code_for(fields)}]
 

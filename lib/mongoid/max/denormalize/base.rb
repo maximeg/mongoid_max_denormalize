@@ -43,13 +43,13 @@ module Mongoid
         end
 
         def relation
-          @meta.name
+          meta.name
         end
         def inverse_relation
-          @meta.inverse
+          meta.inverse
         end
         def inverse_klass
-          @meta.klass
+          meta.klass
         end
 
 

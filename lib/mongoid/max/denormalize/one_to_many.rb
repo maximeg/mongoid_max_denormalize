@@ -6,14 +6,17 @@ module Mongoid
       class OneToMany < Base
 
         def attach
+          #
+          # This side of the relation
+          #
           fields.each do |field|
-            field_meta = meta.klass.fields[field.to_s]
+            field_meta = inverse_klass.fields[field.to_s]
             klass.field "#{relation}_#{field}", type: field_meta.try(:type)
           end
 
-          klass.class_eval <<-EOM, __FILE__, __LINE__
-            before_save :denormalize_from_#{relation}
+          klass.before_save :"denormalize_from_#{relation}"
 
+          klass.class_eval <<-EOM, __FILE__, __LINE__
             def denormalize_from_#{relation}
               return true unless #{meta.key}_changed?
 
@@ -32,9 +35,12 @@ module Mongoid
             end
           EOM
 
-          meta.klass.class_eval <<-EOM, __FILE__, __LINE__
-            around_save :denormalize_to_#{inverse_relation}
+          #
+          # Other side of the relation
+          #
+          inverse_klass.around_save :"denormalize_to_#{inverse_relation}"
 
+          inverse_klass.class_eval <<-EOM, __FILE__, __LINE__
             def denormalize_to_#{inverse_relation}(force = false)
               unless changed? || force
                 yield if block_given?
@@ -57,7 +63,9 @@ module Mongoid
 
               #{inverse_relation}.update to_set
             end
+          EOM
 
+          inverse_klass.class_eval <<-EOM, __FILE__, __LINE__
             def self.denormalize_to_#{inverse_relation}!
               each do |obj|
                 obj.denormalize_to_#{inverse_relation}(true)
@@ -65,9 +73,12 @@ module Mongoid
 
               nil
             end
+          EOM
 
-            around_destroy :denormalize_to_#{inverse_relation}_destroy
 
+          inverse_klass.around_destroy :"denormalize_to_#{inverse_relation}_destroy"
+
+          inverse_klass.class_eval <<-EOM, __FILE__, __LINE__
             def denormalize_to_#{inverse_relation}_destroy
               fields = [#{Base.array_code_for(fields)}]
 
