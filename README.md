@@ -52,7 +52,7 @@ Note: you can't warm up from both sides of the relation. Only the most efficient
 
 **Supported options:** none.
 
-Example :
+####Example:
 
     class Post
       include Mongoid::Document
@@ -112,14 +112,14 @@ This is better :
 
 ### Many to One
 
-**Supported fields:** *only* normal Mongoid fields (no methods)
+**Supported fields:** only normal Mongoid fields, no methods *(optionnal)*
 
 **Supported options:**
 
 *   `:count => true` : to keep a count !
 
 
-Example :
+####Example:
 
     class Post
       include Mongoid::Document
@@ -138,7 +138,7 @@ Example :
       field :stuff
     end
 
-    @post = Post.create(:title => "J'accuse !")
+    @post = Post.create
     @comment = @post.comments.create(:rating => 5, :stuff => "A")
     @comment = @post.comments.create(:rating => 3, :stuff => "B")
     @post.reload
@@ -154,6 +154,28 @@ You can see that each denormalized field in stored in a separate array. This is 
 An option `:group` will come to allow the way below (and maybe permit methods denormalization) :
 
     @post.comments_fields #=> [{:rating => 5, :stuff => "A"}, {:rating => 5, :stuff => "B"}]
+
+####Example 2: only count
+
+    class Post
+      include Mongoid::Document
+      include Mongoid::Max::Denormalize
+
+      has_many :comments
+      denormalize :comments, :count => true
+    end
+
+    class Comment
+      include Mongoid::Document
+
+      belongs_to :post
+    end
+
+    @post = Post.create
+    @comment = @post.comments.create
+    @comment = @post.comments.create
+    @post.reload
+    @post.comments_count  #=> 2
 
 
 ### Many to One
