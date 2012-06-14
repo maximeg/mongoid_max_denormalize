@@ -7,8 +7,8 @@ module Mongoid
 
         def attach
 
-          fields.each do |field|
-            klass.field "#{relation}_#{field}", type: Array
+          fields_only.each do |field|
+            klass.field "#{relation}_#{field}", type: Array, default: []
           end
 
           if has_count?
@@ -16,26 +16,36 @@ module Mongoid
           end
 
           callback_code = <<EOM
-            before_save :denormalize_from_#{relation}
+            before_create :denormalize_from_#{relation}
 
-            def denormalize_from_#{relation}
-              return unless #{meta.key}_changed?
+            def denormalize_from_#{relation}(force=false)
+              #{relation}_retrieved = nil
 
-              fields = [#{Base.array_code_for(fields)}]
-              if #{meta.key}.nil?
-                fields.each do |field|
-                  self.send(:"#{relation}_\#{field}=", nil)
+              fields = [#{Base.array_code_for(fields_only)}]
+              unless fields.empty?
+                #{relation}_retrieved = #{relation}.unscoped.to_a
+                if #{relation}_retrieved.count > 0
+                  fields.each do |field|
+                    self.send(:"#{relation}_\#{field}=", #{relation}_retrieved.map(&field).compact)
+                  end
                 end
-              else
-                fields.each do |field|
-                  self.send(:"#{relation}_\#{field}=", #{relation}.send(field))
-                end
+              end
+
+              if #{has_count?}
+                self.#{relation}_count = #{relation}_retrieved.nil? ? #{relation}.unscoped.count : #{relation}_retrieved.count
               end
 
               true
             end
+
+            def self.denormalize_from_#{relation}!
+              each do |obj|
+                obj.denormalize_from_#{relation}(true)
+                obj.save!
+              end
+            end
 EOM
-          #klass.class_eval callback_code
+          klass.class_eval callback_code
 
           callback_code = <<EOM
             around_save :denormalize_to_#{inverse_relation}
@@ -82,7 +92,7 @@ EOM
                 end
               end
 
-              yield
+              yield if block_given?
               return if changed_fields.empty?
 
               to_update = { "$set" => {}, "$inc" => {} }
@@ -176,7 +186,7 @@ EOM
                 to_rem[:"#{relation}_\#{field}"] = send(field)
               end
 
-              yield
+              yield if block_given?
 
               to_update = { "$set" => {}, "$inc" => {} }
               to_push = {}

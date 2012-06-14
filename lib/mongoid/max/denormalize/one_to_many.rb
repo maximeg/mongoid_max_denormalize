@@ -37,15 +37,15 @@ EOM
           callback_code = <<EOM
             around_save :denormalize_to_#{inverse_relation}
 
-            def denormalize_to_#{inverse_relation}
-              return unless changed?
+            def denormalize_to_#{inverse_relation}(force = false)
+              return unless changed? || force
 
               fields = [#{Base.array_code_for(fields)}]
               fields_only = [#{Base.array_code_for(fields_only)}]
               methods = [#{Base.array_code_for(fields_methods)}]
-              changed_fields = fields_only & changed.map(&:to_sym)
+              changed_fields = force ? fields_only.dup : (fields_only & changed.map(&:to_sym))
 
-              yield
+              yield if block_given?
 
               return if changed_fields.count == 0
 
@@ -57,12 +57,18 @@ EOM
               #{inverse_relation}.update to_set
             end
 
+            def self.denormalize_to_#{inverse_relation}!
+              each do |obj|
+                obj.denormalize_to_#{inverse_relation}(true)
+              end
+            end
+
             around_destroy :denormalize_to_#{inverse_relation}_destroy
 
             def denormalize_to_#{inverse_relation}_destroy
               fields = [#{Base.array_code_for(fields)}]
 
-              yield
+              yield if block_given?
 
               to_set = {}
               fields.each do |field|
