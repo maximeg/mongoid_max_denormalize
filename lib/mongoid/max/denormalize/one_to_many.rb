@@ -60,6 +60,8 @@ EOM
               each do |obj|
                 obj.denormalize_to_#{inverse_relation}(true)
               end
+
+              nil
             end
 
             around_destroy :denormalize_to_#{inverse_relation}_destroy

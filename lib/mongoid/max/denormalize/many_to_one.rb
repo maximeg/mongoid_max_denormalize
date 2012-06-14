@@ -50,6 +50,8 @@ module Mongoid
                 obj.denormalize_from_#{relation}(true)
                 obj.save!
               end
+
+              nil
             end
 EOM
           klass.class_eval callback_code
