@@ -91,6 +91,8 @@ EOM
                     end
                   end
                 end
+              elsif #{inverse_meta.key}.nil?
+                changed_fields = []
               else
                 changed_fields = fields & changed.map(&:to_sym)
                 changed_fields.each do |field|
