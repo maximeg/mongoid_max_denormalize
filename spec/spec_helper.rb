@@ -18,6 +18,8 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
+    Moped.logger.info("\n  ### " << example.full_description)
+
     Mongoid.purge!
     Mongoid::IdentityMap.clear
   end
