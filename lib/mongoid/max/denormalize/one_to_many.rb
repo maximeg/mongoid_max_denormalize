@@ -15,7 +15,7 @@ module Mongoid
             before_save :denormalize_from_#{relation}
 
             def denormalize_from_#{relation}
-              return unless #{meta.key}_changed?
+              return true unless #{meta.key}_changed?
 
               fields = [#{Base.array_code_for(fields)}]
               if #{meta.key}.nil?
@@ -37,7 +37,10 @@ EOM
             around_save :denormalize_to_#{inverse_relation}
 
             def denormalize_to_#{inverse_relation}(force = false)
-              return unless changed? || force
+              unless changed? || force
+                yield if block_given?
+                return
+              end
 
               fields = [#{Base.array_code_for(fields)}]
               fields_only = [#{Base.array_code_for(fields_only)}]
@@ -76,7 +79,7 @@ EOM
                 to_set[:"#{relation}_\#{field}"] = nil
               end
 
-              #{inverse_relation}.update to_set
+              #{inverse_relation}.update(to_set) unless to_set.empty?
             end
 EOM
           meta.klass.class_eval callback_code

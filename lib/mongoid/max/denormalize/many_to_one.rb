@@ -60,7 +60,11 @@ EOM
             around_save :denormalize_to_#{inverse_relation}
 
             def denormalize_to_#{inverse_relation}
-              return if !changed? && !new_record?
+              if !changed? && !new_record?
+                yield if block_given?
+                return
+              end
+
               was_new = new_record?
               was_added = false
               was_removed = false
