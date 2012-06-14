@@ -4,7 +4,7 @@ module Mongoid
     module Denormalize
       module Version
 
-        STRING = '0.0.4'
+        STRING = '0.0.5'
 
       end
     end
