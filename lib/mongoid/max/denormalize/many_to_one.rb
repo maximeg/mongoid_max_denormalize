@@ -133,12 +133,11 @@ EOM
                 to_update["$set"][field] = array
               end
 
-
               to_update["$inc"][:#{relation}_count] = 1 if #{has_count?} && (was_new || was_added)
               to_update["$inc"][:#{relation}_count] = -1 if #{has_count?} && (was_removed)
 
+              to_update.reject! {|k,v| v.empty?}
               #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
-
 
               #{klass}.collection.find(:_id => remote_id).update_all({"$push" => to_push}) unless to_push.empty?
             end
@@ -176,6 +175,7 @@ EOM
 
               to_update["$inc"][:#{relation}_count] = -1 if #{has_count?}
 
+              to_update.reject! {|k,v| v.empty?}
               #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
             end
 
@@ -216,6 +216,7 @@ EOM
 
               to_update["$inc"][:#{relation}_count] = -1 if #{has_count?}
 
+              to_update.reject! {|k,v| v.empty?}
               #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
             end
 EOM
