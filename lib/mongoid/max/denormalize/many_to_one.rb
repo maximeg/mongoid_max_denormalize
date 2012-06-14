@@ -22,7 +22,7 @@ module Mongoid
             klass.field "#{relation}_count", type: Integer, default: 0
           end
 
-          callback_code = <<EOM
+          klass.class_eval <<-EOM, __FILE__, __LINE__
             before_create :denormalize_from_#{relation}
 
             def denormalize_from_#{relation}(force=false)
@@ -53,10 +53,9 @@ module Mongoid
 
               nil
             end
-EOM
-          klass.class_eval callback_code
+          EOM
 
-          callback_code = <<EOM
+          meta.klass.class_eval <<-EOM, __FILE__, __LINE__
             around_save :denormalize_to_#{inverse_relation}
 
             def denormalize_to_#{inverse_relation}
@@ -223,8 +222,7 @@ EOM
               to_update.reject! {|k,v| v.empty?}
               #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
             end
-EOM
-          meta.klass.class_eval callback_code
+          EOM
         end
 
         def allowed_options

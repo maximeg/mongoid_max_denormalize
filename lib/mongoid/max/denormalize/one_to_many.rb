@@ -11,7 +11,7 @@ module Mongoid
             klass.field "#{relation}_#{field}", type: field_meta.try(:type)
           end
 
-          callback_code = <<EOM
+          klass.class_eval <<-EOM, __FILE__, __LINE__
             before_save :denormalize_from_#{relation}
 
             def denormalize_from_#{relation}
@@ -30,10 +30,9 @@ module Mongoid
 
               true
             end
-EOM
-          klass.class_eval callback_code
+          EOM
 
-          callback_code = <<EOM
+          meta.klass.class_eval <<-EOM, __FILE__, __LINE__
             around_save :denormalize_to_#{inverse_relation}
 
             def denormalize_to_#{inverse_relation}(force = false)
@@ -81,8 +80,7 @@ EOM
 
               #{inverse_relation}.update(to_set) unless to_set.empty?
             end
-EOM
-          meta.klass.class_eval callback_code
+          EOM
         end
 
       end
