@@ -9,6 +9,8 @@ For now, support only Mongoid 3.
 * Propagate only when needed
 * Take advantage of atomic operations on multi documents of MongoDB
 
+*This is a pre-version not suitable for production.*
+
 
 
 ## Installation
@@ -29,29 +31,33 @@ Or install with RubyGems:
 
 Add `include Mongoid::Max::Denormalize` in your model and also:
 
-      denormalize relation, field_1, field_2 ... field_n, options
+    denormalize relation, field_1, field_2 ... field_n, options
 
 
 ### One to Many
 
-Supported fields: normal Mongoid fields, and methods.
+**Supported fields:** normal Mongoid fields, and methods.
 
-Supported options: none.
+**Supported options:** none.
 
 Example :
 
     class Post
       include Mongoid::Document
+
       field :title
+
       def slug
         title.try(:parameterize)
       end
+
       has_many :comments
     end
 
     class Comment
       include Mongoid::Document
       include Mongoid::Max::Denormalize
+
       belons_to :post
       denormalize :post, :title, :slug
     end
@@ -60,7 +66,7 @@ Example :
     @comment = @post.comments.create
     @comment.post_title #=> "Mush from the Wimp"
     @comment.post_slug  #=> "mush-from-the-wimp"
-    #
+
     @post.update_attributes(:title => "All Must Share The Burden")
     @comment.reload     # to reload the comment from the DB
     @comment.post_title #=> "All Must Share The Burden"
@@ -90,9 +96,9 @@ This is better :
 
 ### Many to One
 
-Supported fields: **only** normal Mongoid fields (no methods)
+**Supported fields:** *only* normal Mongoid fields (no methods)
 
-Supported options:
+**Supported options:**
 
 *   `:count => true` : to keep a count !
 
@@ -102,13 +108,16 @@ Example :
     class Post
       include Mongoid::Document
       include Mongoid::Max::Denormalize
+
       has_many :comments
       denormalize :comments, :rating, :stuff, :count => true
     end
 
     class Comment
       include Mongoid::Document
+
       belons_to :post
+
       field :rating
       field :stuff
     end
@@ -117,9 +126,9 @@ Example :
     @comment = @post.comments.create(:rating => 5, :stuff => "A")
     @comment = @post.comments.create(:rating => 3, :stuff => "B")
     @post.reload
-    @post.comments_count #=> 2
+    @post.comments_count  #=> 2
     @post.comments_rating #=> [5, 3]
-    @post.comments_stuff #=> ["A", "B"]
+    @post.comments_stuff  #=> ["A", "B"]
 
 You can see that each denormalized field in stored in a separate array. This is wanted.
 An option `:group` will come to allow :
