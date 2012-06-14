@@ -20,26 +20,20 @@ module Mongoid
 #          puts "#options  : #{options.inspect}"
 
           meta = self.relations[relation.to_s]
-          raise ConfigError.new("Unknown relation :#{relation}", self) if meta.nil?
+          raise ConfigError.new("Unknown relation", self, relation) if meta.nil?
 #          puts "#        meta : #{meta.inspect}"
 
           inverse_meta = meta.klass.relations[meta.inverse.to_s]
-          raise ConfigError.new("Unknown inverse relation for :#{relation}", self) if inverse_meta.nil?
+          raise ConfigError.new("Unknown inverse relation", self, relation) if inverse_meta.nil?
 #          puts "#inverse_meta : #{inverse_meta.inspect}"
 
-          methods = []
-          fields.each do |field|
-            unless meta.klass.instance_methods.include? field
-              raise ConfigError.new("Unknown field or method :#{field} in :#{relation}", self)
-            end
-          end
 
           if meta.relation == Mongoid::Relations::Referenced::In && inverse_meta.relation == Mongoid::Relations::Referenced::Many
             OneToMany.new(self, meta, inverse_meta, fields, options).attach
           elsif meta.relation == Mongoid::Relations::Referenced::Many && inverse_meta.relation == Mongoid::Relations::Referenced::In
             ManyToOne.new(self, meta, inverse_meta, fields, options).attach
           else
-            raise ConfigError.new("Relation not supported :#{relation}", self)
+            raise ConfigError.new("Relation not supported", self, relation)
           end
 
         end

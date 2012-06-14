@@ -5,8 +5,15 @@ module Mongoid
 
       class ManyToOne < Base
 
-        def attach
+        def verify
+          super
 
+          unless fields_methods.empty?
+            raise ConfigError.new("Methods denormalization not supported for Many to One", klass, relation)
+          end
+        end
+
+        def attach
           fields_only.each do |field|
             klass.field "#{relation}_#{field}", type: Array, default: []
           end
@@ -213,6 +220,10 @@ EOM
             end
 EOM
           meta.klass.class_eval callback_code
+        end
+
+        def allowed_options
+          super + [:count]
         end
 
         def has_count?

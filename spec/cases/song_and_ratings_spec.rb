@@ -19,7 +19,8 @@ class Song
 
   has_many :ratings
 
-  denormalize :ratings, :note, :comment, count: true, mean: [:note]
+  #denormalize :ratings, :note, :comment, count: true, mean: [:note]
+  denormalize :ratings, :note, :comment, count: true
 end
 
 

@@ -4,8 +4,8 @@ module Mongoid
     module Denormalize
       class ConfigError < ::StandardError
 
-        def initialize(summary, klass)
-          super("[#{klass}.denormalize] #{summary}")
+        def initialize(summary, klass, relation=nil)
+          super("[%s.denormalize%s] %s" % [klass, relation && " :#{relation}", summary])
         end
 
       end

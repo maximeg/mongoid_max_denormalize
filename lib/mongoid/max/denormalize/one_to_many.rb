@@ -6,7 +6,6 @@ module Mongoid
       class OneToMany < Base
 
         def attach
-
           fields.each do |field|
             field_meta = meta.klass.fields[field.to_s]
             klass.field "#{relation}_#{field}", type: field_meta.try(:type)
@@ -79,9 +78,6 @@ EOM
             end
 EOM
           meta.klass.class_eval callback_code
-
-
-
         end
 
       end
