@@ -203,7 +203,6 @@ EOM
             end
 EOM
           meta.klass.class_eval callback_code
-          puts callback_code
         end
 
         def has_count?
