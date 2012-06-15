@@ -36,16 +36,17 @@ describe "Case: a city and his inhabitants" do
     context "considering the city" do
       subject { @city }
 
-      it "should not have inhabitants" do
+      it "count should be 0" do
         @city.inhabitants.should be_empty
         @city.inhabitants_count.should eq 0
       end
     end
   end
 
-  context "when adding 20 inhabitants" do
+  inhabitants_number = 5
+  context "when adding #{inhabitants_number} inhabitants" do
     before do
-      5.times do
+      inhabitants_number.times do
         @city.inhabitants.create!
       end
       @city.reload
@@ -54,8 +55,10 @@ describe "Case: a city and his inhabitants" do
     context "considering the city" do
       subject { @city }
 
-      its(:inhabitants) { should have(5).inhabitants }
-      its(:inhabitants_count) { should eq 5 }
+      it "count should be #{inhabitants_number}" do
+        @city.inhabitants.should have(inhabitants_number).inhabitants
+        @city.inhabitants_count.should eq inhabitants_number
+      end
 
       context "when destroying 2 inhabitants" do
         before do
@@ -65,8 +68,10 @@ describe "Case: a city and his inhabitants" do
           @city.reload
         end
 
-        its(:inhabitants) { should have(3).inhabitants }
-        its(:inhabitants_count) { should eq 3 }
+        it "count should be #{inhabitants_number - 2}" do
+          @city.inhabitants.should have(inhabitants_number - 2).inhabitants
+          @city.inhabitants_count.should eq(inhabitants_number - 2)
+        end
       end
 
       context "when destroying all inhabitants" do
@@ -75,8 +80,10 @@ describe "Case: a city and his inhabitants" do
           @city.reload
         end
 
-        its(:inhabitants) { should have(0).inhabitant }
-        its(:inhabitants_count) { should eq 0 }
+        it "count should be 0" do
+          @city.inhabitants.should be_empty
+          @city.inhabitants_count.should eq 0
+        end
       end
     end
   end

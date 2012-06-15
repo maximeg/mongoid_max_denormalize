@@ -35,12 +35,8 @@ describe "Case: a song and his ratings" do
   end
 
   context "when nothing" do
-    context "considering the song" do
-      subject { @song }
-
-      it "should not have ratings" do
-        @song.ratings.should be_empty
-      end
+    it "Song should not have ratings" do
+      @song.ratings.should be_empty
     end
   end
 
@@ -53,11 +49,13 @@ describe "Case: a song and his ratings" do
     context "considering the song" do
       subject { @song }
 
-      its(:ratings) { should have(1).rating }
-      its(:ratings_count) { should eq 1 }
-      its(:ratings_note) { should eq [5] }
-      its(:ratings_comment) { should eq ["Good!"] }
-      its(:ratings_upset_level) { should eq [] }
+      it "denormalized fields should be set" do
+        @song.ratings.should have(1).rating
+        @song.ratings_count.should eq 1
+        @song.ratings_note.should eq [5]
+        @song.ratings_comment.should eq ["Good!"]
+        @song.ratings_upset_level.should eq []
+      end
 
       context "when modifing the first rating (=4)" do
         before do
@@ -67,11 +65,13 @@ describe "Case: a song and his ratings" do
           @song.reload
         end
 
-        its(:ratings) { should have(1).rating }
-        its(:ratings_count) { should eq 1 }
-        its(:ratings_note) { should eq [4] }
-        its(:ratings_comment) { should eq ["Good!"] }
-        its(:ratings_upset_level) { should eq [0] }
+        it "denormalized fields should be set" do
+          @song.ratings.should have(1).rating
+          @song.ratings_count.should eq 1
+          @song.ratings_note.should eq [4]
+          @song.ratings_comment.should eq ["Good!"]
+          @song.ratings_upset_level.should eq [0]
+        end
       end
 
       context "when adding an other rating (=5)" do
@@ -80,10 +80,12 @@ describe "Case: a song and his ratings" do
           @song.reload
         end
 
-        its(:ratings) { should have(2).rating }
-        its(:ratings_count) { should eq 2 }
-        its(:ratings_note) { should eq [5, 5] }
-        its(:ratings_comment) { should eq ["Good!", "Another good!"] }
+        it "denormalized fields should be set" do
+          @song.ratings.should have(2).rating
+          @song.ratings_count.should eq 2
+          @song.ratings_note.should eq [5, 5]
+          @song.ratings_comment.should eq ["Good!", "Another good!"]
+        end
 
         context "when modifing the first rating (=4)" do
           before do
@@ -92,9 +94,11 @@ describe "Case: a song and his ratings" do
             @song.reload
           end
 
-          its(:ratings_count) { should eq 2 }
-          its(:ratings_note) { should eq [5, 4] }
-          its(:ratings_comment) { should eq ["Good!", "Another good!"] }
+          it "denormalized fields should be set" do
+            @song.ratings_count.should eq 2
+            @song.ratings_note.should eq [5, 4]
+            @song.ratings_comment.should eq ["Good!", "Another good!"]
+          end
         end
 
         context "when modifing the other rating (=4)" do
@@ -104,9 +108,11 @@ describe "Case: a song and his ratings" do
             @song.reload
           end
 
-          its(:ratings_count) { should eq 2 }
-          its(:ratings_note) { should eq [5, 4] }
-          its(:ratings_comment) { should eq ["Good!", "Another good!"] }
+          it "denormalized fields should be set" do
+            @song.ratings_count.should eq 2
+            @song.ratings_note.should eq [5, 4]
+            @song.ratings_comment.should eq ["Good!", "Another good!"]
+          end
 
           context "when modifing again the other rating (=3)" do
             before do
@@ -116,9 +122,11 @@ describe "Case: a song and his ratings" do
               @song.reload
             end
 
-            its(:ratings_count) { should eq 2 }
-            its(:ratings_note) { should eq [5, 3] }
-            its(:ratings_comment) { should eq ["Good!", "Another good, again!"] }
+            it "denormalized fields should be set" do
+              @song.ratings_count.should eq 2
+              @song.ratings_note.should eq [5, 3]
+              @song.ratings_comment.should eq ["Good!", "Another good, again!"]
+            end
           end
         end
 
@@ -128,10 +136,12 @@ describe "Case: a song and his ratings" do
             @song.reload
           end
 
-          its(:ratings_count) { should eq 1 }
-          its(:ratings) { should have(1).rating }
-          its(:ratings_note) { should eq [5] }
-          its(:ratings_comment) { should eq ["Good!"] }
+          it "denormalized fields should be set" do
+            @song.ratings_count.should eq 1
+            @song.ratings.should have(1).rating
+            @song.ratings_note.should eq [5]
+            @song.ratings_comment.should eq ["Good!"]
+          end
         end
       end
 
@@ -141,10 +151,12 @@ describe "Case: a song and his ratings" do
           @song.reload
         end
 
-        its(:ratings) { should have(1).rating }
-        its(:ratings_count) { should eq 1 }
-        its(:ratings_note) { should eq [5] }
-        its(:ratings_comment) { should eq ["Good!"] }
+        it "denormalized fields should remain the same" do
+          @song.ratings.should have(1).rating
+          @song.ratings_count.should eq 1
+          @song.ratings_note.should eq [5]
+          @song.ratings_comment.should eq ["Good!"]
+        end
 
         context "when associating it" do
           before do
@@ -153,10 +165,12 @@ describe "Case: a song and his ratings" do
             @song.reload
           end
 
-          its(:ratings) { should have(2).rating }
-          its(:ratings_count) { should eq 2 }
-          its(:ratings_note) { should eq [5, 1] }
-          its(:ratings_comment) { should eq ["Good!", "Bad"] }
+          it "denormalized fields should be set" do
+            @song.ratings.should have(2).rating
+            @song.ratings_count.should eq 2
+            @song.ratings_note.should eq [5, 1]
+            @song.ratings_comment.should eq ["Good!", "Bad"]
+          end
         end
 
         context "when associating it (2nd way)" do
@@ -165,10 +179,12 @@ describe "Case: a song and his ratings" do
             @song.reload
           end
 
-          its(:ratings) { should have(2).rating }
-          its(:ratings_count) { should eq 2 }
-          its(:ratings_note) { should eq [5, 1] }
-          its(:ratings_comment) { should eq ["Good!", "Bad"] }
+          it "denormalized fields should be set" do
+            @song.ratings.should have(2).rating
+            @song.ratings_count.should eq 2
+            @song.ratings_note.should eq [5, 1]
+            @song.ratings_comment.should eq ["Good!", "Bad"]
+          end
         end
       end
 
@@ -180,22 +196,19 @@ describe "Case: a song and his ratings" do
           @song.reload
         end
 
-        its(:ratings) { should have(0).rating }
-        its(:ratings_count) { should eq 0 }
-        its(:ratings_note) { should eq [] }
-        its(:ratings_comment) { should eq [] }
+        it "denormalized fields should be set in old Song" do
+          @song.ratings.should have(0).rating
+          @song.ratings_count.should eq 0
+          @song.ratings_note.should eq []
+          @song.ratings_comment.should eq []
+        end
 
-        context "considering the other song" do
-          before do
-            @other_song.reload
-          end
-
-          subject { @other_song }
-
-          its(:ratings) { should have(1).rating }
-          its(:ratings_count) { should eq 1 }
-          its(:ratings_note) { should eq [5] }
-          its(:ratings_comment) { should eq ["Good!"] }
+        it "denormalized fields should be set in new Song" do
+          @other_song.reload
+          @other_song.ratings.should have(1).rating
+          @other_song.ratings_count.should eq 1
+          @other_song.ratings_note.should eq [5]
+          @other_song.ratings_comment.should eq ["Good!"]
         end
       end
     end

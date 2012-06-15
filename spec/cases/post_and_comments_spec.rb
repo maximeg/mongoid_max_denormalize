@@ -57,12 +57,10 @@ describe "Case: a post and his comments" do
       its(:comments) { should have(comments_number).comment }
     end
 
-    (0..comments_number-1).each do |i|
-      context "considering the comment #{i}" do
-        subject { @comments[i] }
-
-        its(:post_title) { should eq @post.title }
-        its(:post_slug) { should eq @post.slug }
+    it "denormalized fields should be set" do
+      @comments.each do |comment|
+        comment.post_title.should eq @post.title
+        comment.post_slug.should eq @post.slug
       end
     end
 
@@ -73,12 +71,10 @@ describe "Case: a post and his comments" do
         @comments.each(&:reload)
       end
 
-      (0..comments_number-1).each do |i|
-        context "considering the comment #{i}" do
-          subject { @comments[i] }
-
-          its(:post_title) { should eq @post.title }
-          its(:post_slug) { should eq @post.slug }
+      it "denormalized fields should be set" do
+        @comments.each do |comment|
+          comment.post_title.should eq @post.title
+          comment.post_slug.should eq @post.slug
         end
       end
     end
@@ -89,12 +85,10 @@ describe "Case: a post and his comments" do
         @comments.each(&:reload)
       end
 
-      (0..comments_number-1).each do |i|
-        context "considering the comment #{i}" do
-          subject { @comments[i] }
-
-          its(:post_title) { should be_nil }
-          its(:post_slug) { should be_nil }
+      it "denormalized fields should be set" do
+        @comments.each do |comment|
+          comment.post_title.should be_nil
+          comment.post_slug.should be_nil
         end
       end
     end
@@ -106,10 +100,10 @@ describe "Case: a post and his comments" do
       @post.reload
     end
 
-    subject { @comment_only }
-
-    its(:post_title) { should be_nil }
-    its(:post_slug) { should be_nil }
+    it "denormalized fields should be nil" do
+      @comment_only.post_title.should be_nil
+      @comment_only.post_slug.should be_nil
+    end
 
     context "when associating it" do
       before do
@@ -117,8 +111,10 @@ describe "Case: a post and his comments" do
         @comment_only.save!
       end
 
-      its(:post_title) { should eq @post.title }
-      its(:post_slug) { should eq @post.slug }
+      it "denormalized fields should be set" do
+        @comment_only.post_title.should eq @post.title
+        @comment_only.post_slug.should eq @post.slug
+      end
     end
 
     context "when associating it (2nd way)" do
@@ -127,8 +123,10 @@ describe "Case: a post and his comments" do
         @comment_only.reload
       end
 
-      its(:post_title) { should eq @post.title }
-      its(:post_slug) { should eq @post.slug }
+      it "denormalized fields should be set" do
+        @comment_only.post_title.should eq @post.title
+        @comment_only.post_slug.should eq @post.slug
+      end
     end
   end
 
@@ -137,10 +135,10 @@ describe "Case: a post and his comments" do
       @comment = @post.comments.create!
     end
 
-    subject { @comment }
-
-    its(:post_title) { should eq @post.title }
-    its(:post_slug) { should eq @post.slug }
+    it "denormalized fields should be set" do
+      @comment.post_title.should eq @post.title
+      @comment.post_slug.should eq @post.slug
+    end
 
     context "when associating the comment to another post" do
       before do
@@ -149,8 +147,10 @@ describe "Case: a post and his comments" do
         @comment.save
       end
 
-      its(:post_title) { should eq @other_post.title }
-      its(:post_slug) { should eq @other_post.slug }
+      it "denormalized fields should be set" do
+        @comment.post_title.should eq @other_post.title
+        @comment.post_slug.should eq @other_post.slug
+      end
     end
   end
 
