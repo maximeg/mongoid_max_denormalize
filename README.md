@@ -1,10 +1,6 @@
 # Mongoid::Max::Denormalize
 
-`Mongoid::Max::Denormalize` is a denormalization extension for Mongoid.
-
-It was designed for a minimum number of queries to the database.
-
-For now, support only Mongoid 3.
+`Mongoid::Max::Denormalize` is a denormalization extension for Mongoid. It was designed to do a minimum number of queries to the database.
 
 * Denormalize fields
 * Denormalize methods (only in One to Many situations for now)
@@ -14,8 +10,7 @@ For now, support only Mongoid 3.
     * for methods: always (we can't know in an inexpensive way what is the old value to figure out if there is a change)
 * Take advantage of atomic operations on multiple documents of MongoDB
 
-*This is a pre-version not suitable for production.*
-
+**Versions supported:** Mongoid 3.0 and Mongoid 2.4
 [![Continuous Integration status](https://secure.travis-ci.org/maximeg/mongoid_max_denormalize.png)](http://travis-ci.org/maximeg/mongoid_max_denormalize)
 
 ## Installation
@@ -52,7 +47,7 @@ Note: you can't warm up from both sides of the relation. Only the most efficient
 
 **Supported options:** none.
 
-####Example:
+#### Example:
 
     class Post
       include Mongoid::Document
@@ -119,7 +114,7 @@ This is better :
 *   `:count => true` : to keep a count !
 
 
-####Example:
+#### Example:
 
     class Post
       include Mongoid::Document
@@ -155,7 +150,7 @@ An option `:group` will come to allow the way below (and maybe permit methods de
 
     @post.comments_fields #=> [{:rating => 5, :stuff => "A"}, {:rating => 5, :stuff => "B"}]
 
-####Example 2: only count
+#### Example 2: only count
 
     class Post
       include Mongoid::Document
