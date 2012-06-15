@@ -1,4 +1,4 @@
-Gemfile.lock
+Gemfile*.lock
 log
 mongoid_max_denormalize-*.gem
 

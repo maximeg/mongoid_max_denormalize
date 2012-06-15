@@ -1,0 +1,11 @@
+source "http://rubygems.org"
+gemspec
+
+# For Travis
+gem "rake"
+
+# Specific to Mongoid 2
+gem "bson_ext"
+
+# run with: bundle install --gemfile=Gemfile.mongoid2
+

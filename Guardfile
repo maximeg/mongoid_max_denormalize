@@ -1,3 +1,5 @@
+ENV['BUNDLE_GEMFILE'] = "Gemfile.mongoid2" if ENV['MONGOID'] == "2"
+
 guard(
   'rspec',
   :all_after_pass => false,
