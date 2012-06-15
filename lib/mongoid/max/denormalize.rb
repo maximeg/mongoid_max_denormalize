@@ -39,10 +39,10 @@ module Mongoid
         end
 
         def mongoid3
-          Mongoid::VERSION =~ /\A3\./
+          defined? Moped
         end
         def mongoid2
-          Mongoid::VERSION =~ /\A2\./
+          defined? Mongo
         end
 
         def denormalize_update_all(conditions, updates)
