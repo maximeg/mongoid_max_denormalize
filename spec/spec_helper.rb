@@ -5,14 +5,22 @@ require 'mongoid'
 require 'mongoid_max_denormalize'
 require 'logger'
 
-Mongoid.configure do |config|
-  config.connect_to('mongoid_max_denormalize_test')
+# When testing locally we use the database named mongoid_max_denormalize_test.
+# However when tests are running in parallel on Travis we need to use different
+# database names for each process running since we do not have transactions and
+# want a clean slate before each spec run.
+def database_name
+  ENV["CI"] ? "mongoid_max_denormalize_#{Process.pid}" : "mongoid_max_denormalize_test"
 end
 
-Mongoid.logger = Logger.new("log/mongoid-test.log")
-Mongoid.logger.level = Logger::DEBUG
+# Logger
 Moped.logger = Logger.new("log/moped-test.log")
 Moped.logger.level = Logger::DEBUG
+
+Mongoid.configure do |config|
+  config.connect_to(database_name)
+end
+
 
 RSpec.configure do |config|
 
@@ -22,6 +30,14 @@ RSpec.configure do |config|
 
     Mongoid.purge!
     Mongoid::IdentityMap.clear
+  end
+
+  # On travis we are creating many different databases on each test run. We
+  # drop the database after the suite.
+  config.after(:suite) do
+    if ENV["CI"]
+      Mongoid::Threaded.sessions[:default].drop
+    end
   end
 
 end
