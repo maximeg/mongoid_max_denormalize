@@ -1,0 +1,26 @@
+source "http://rubygems.org"
+gemspec
+
+# For Travis
+gem "rake"
+
+# Specific to Mongoid 2
+gem "bson_ext"
+
+#
+# To use it:
+#
+# bundle install --gemfile=Gemfile.mongoid2
+#
+# BUNDLE_GEMFILE=Gemfile.mongoid2 bundle exec rspec
+# BUNDLE_GEMFILE=Gemfile.mongoid2 bundle exec guard
+# BUNDLE_GEMFILE=Gemfile.mongoid2 bundle exec rake
+#
+# You can alos use these shortcuts:
+#
+# MONGOID=2 bundle exec guard
+# MONGOID=2 guard
+# MONGOID=2 bundle exec rake
+# MONGOID=2 rake
+#
+

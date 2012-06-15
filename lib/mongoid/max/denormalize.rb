@@ -38,6 +38,21 @@ module Mongoid
 
         end
 
+        def mongoid3
+          Mongoid::VERSION =~ /\A3\./
+        end
+        def mongoid2
+          Mongoid::VERSION =~ /\A2\./
+        end
+
+        def denormalize_update_all(conditions, updates)
+          if mongoid3
+            self.collection.find(conditions).update_all(updates)
+          else
+            self.collection.update(conditions, updates, :multi => true)
+          end
+        end
+
       end
 
     end

@@ -67,7 +67,7 @@ module Mongoid
 
           inverse_klass.class_eval <<-EOM, __FILE__, __LINE__
             def self.denormalize_to_#{inverse_relation}!
-              each do |obj|
+              all.entries.each do |obj|
                 obj.denormalize_to_#{inverse_relation}(true)
               end
 
