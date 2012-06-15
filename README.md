@@ -16,7 +16,7 @@ For now, support only Mongoid 3.
 
 *This is a pre-version not suitable for production.*
 
-
+[![Continuous Integration status](https://secure.travis-ci.org/maximeg/mongoid_max_denormalize.png)](http://travis-ci.org/maximeg/mongoid_max_denormalize)
 
 ## Installation
 
