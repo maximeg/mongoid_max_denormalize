@@ -51,7 +51,7 @@ module Mongoid
 
           klass.class_eval <<-EOM, __FILE__, __LINE__
             def self.denormalize_from_#{relation}!
-              each do |obj|
+              all.entries.each do |obj|
                 obj.denormalize_from_#{relation}(true)
                 obj.save!
               end
@@ -151,7 +151,7 @@ module Mongoid
               to_update["$inc"][:#{relation}_count] = -1 if #{has_count?} && (was_removed)
 
               to_update.reject! {|k,v| v.empty?}
-              #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
+              #{klass}.denormalize_update_all({:_id => remote_id}, to_update) unless to_update.empty?
             end
           EOM
 
@@ -190,7 +190,7 @@ module Mongoid
               to_update["$inc"][:#{relation}_count] = -1 if #{has_count?}
 
               to_update.reject! {|k,v| v.empty?}
-              #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
+              #{klass}.denormalize_update_all({:_id => remote_id}, to_update) unless to_update.empty?
             end
           EOM
 
@@ -231,7 +231,7 @@ module Mongoid
               to_update["$inc"][:#{relation}_count] = -1 if #{has_count?}
 
               to_update.reject! {|k,v| v.empty?}
-              #{klass}.collection.find(:_id => remote_id).update_all(to_update) unless to_update.empty?
+              #{klass}.denormalize_update_all({:_id => remote_id}, to_update) unless to_update.empty?
             end
           EOM
         end

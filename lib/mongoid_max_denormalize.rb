@@ -9,3 +9,5 @@ require 'mongoid/max/denormalize/base'
 require 'mongoid/max/denormalize/one_to_many'
 require 'mongoid/max/denormalize/many_to_one'
 
+require 'mongoid/version'
+
