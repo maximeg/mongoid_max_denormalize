@@ -3,7 +3,6 @@ require 'rubygems'
 require 'rspec'
 require 'mongoid'
 require 'mongoid_max_denormalize'
-require 'logger'
 
 # When testing locally we use the database named mongoid_max_denormalize_test.
 # However when tests are running in parallel on Travis we need to use different
@@ -14,8 +13,10 @@ def database_name
 end
 
 # Logger
-Moped.logger = Logger.new("log/moped-test.log")
-Moped.logger.level = Logger::DEBUG
+unless ENV["CI"]
+  Moped.logger = Logger.new("log/moped-test.log")
+  Moped.logger.level = Logger::DEBUG
+end
 
 Mongoid.configure do |config|
   config.connect_to(database_name)
@@ -26,7 +27,7 @@ RSpec.configure do |config|
 
   # Drop all collections and clear the identity map before each spec.
   config.before(:each) do
-    Moped.logger.info("\n  ### " << example.full_description)
+    Moped.logger.info("\n  ### " << example.full_description) unless ENV["CI"]
 
     Mongoid.purge!
     Mongoid::IdentityMap.clear
