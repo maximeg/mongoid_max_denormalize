@@ -31,7 +31,9 @@ Or install with RubyGems:
 
 Add `include Mongoid::Max::Denormalize` in your model and also:
 
-    denormalize relation, field_1, field_2 ... field_n, options
+```ruby
+denormalize relation, field_1, field_2 ... field_n, options
+```
 
 
 ### Warming up
@@ -49,60 +51,68 @@ Note: you can't warm up from both sides of the relation. Only the most efficient
 
 #### Example:
 
-    class Post
-      include Mongoid::Document
+```ruby
+class Post
+  include Mongoid::Document
 
-      field :title
+  field :title
 
-      def slug
-        title.try(:parameterize)
-      end
+  def slug
+    title.try(:parameterize)
+  end
 
-      has_many :comments
-    end
+  has_many :comments
+end
 
-    class Comment
-      include Mongoid::Document
-      include Mongoid::Max::Denormalize
+class Comment
+  include Mongoid::Document
+  include Mongoid::Max::Denormalize
 
-      belongs_to :post
-      denormalize :post, :title, :slug
-    end
+  belongs_to :post
+  denormalize :post, :title, :slug
+end
 
-    @post = Post.create(:title => "Mush from the Wimp")
-    @comment = @post.comments.create
-    @comment.post_title #=> "Mush from the Wimp"
-    @comment.post_slug  #=> "mush-from-the-wimp"
+@post = Post.create(:title => "Mush from the Wimp")
+@comment = @post.comments.create
+@comment.post_title #=> "Mush from the Wimp"
+@comment.post_slug  #=> "mush-from-the-wimp"
 
-    @post.update_attributes(:title => "All Must Share The Burden")
-    @comment.reload     # to reload the comment from the DB
-    @comment.post_title #=> "All Must Share The Burden"
-    @comment.post_slug  #=> "all-must-share-the-burden"
+@post.update_attributes(:title => "All Must Share The Burden")
+@comment.reload     # to reload the comment from the DB
+@comment.post_title #=> "All Must Share The Burden"
+@comment.post_slug  #=> "all-must-share-the-burden"
+```
 
 To warm up the denormalization for an existing collection:
 
-    Post.denormalize_to_comments!
+```ruby
+Post.denormalize_to_comments!
+```
 
 **Tips :** In your views, do not use `@comment.post` but `@comment.post_id` or `@comment.post_id?`
 to avoid a query that checks/retrieve for the post. We want to avoid it, don't we ?
 
 Exemple : Check your logs, you'll see queries for the post :
 
-    # app/views/comments/_comment.html.erb
-    <div class="comment">
-      <% if @comment.post %>
-        <%= link_to @comment.post_title, @comment.post %>
-      <% end %>
-    </div>
+```ruby
+# app/views/comments/_comment.html.erb
+<div class="comment">
+  <% if @comment.post %>
+    <%= link_to @comment.post_title, @comment.post %>
+  <% end %>
+</div>
+```
 
 This is better :
 
-    # app/views/comments/_comment.html.erb
-    <div class="comment">
-      <% if @comment.post_id? %>
-        <%= link_to @comment.post_title, post_path(@comment.post_id, :slug => @comment.post_slug) %>
-      <% end %>
-    </div>
+```ruby
+# app/views/comments/_comment.html.erb
+<div class="comment">
+  <% if @comment.post_id? %>
+    <%= link_to @comment.post_title, post_path(@comment.post_id, :slug => @comment.post_slug) %>
+  <% end %>
+</div>
+```
 
 
 ### Many to One
@@ -116,61 +126,69 @@ This is better :
 
 #### Example:
 
-    class Post
-      include Mongoid::Document
-      include Mongoid::Max::Denormalize
+```ruby
+class Post
+  include Mongoid::Document
+  include Mongoid::Max::Denormalize
 
-      has_many :comments
-      denormalize :comments, :rating, :stuff, :count => true
-    end
+  has_many :comments
+  denormalize :comments, :rating, :stuff, :count => true
+end
 
-    class Comment
-      include Mongoid::Document
+class Comment
+  include Mongoid::Document
 
-      belongs_to :post
+  belongs_to :post
 
-      field :rating
-      field :stuff
-    end
+  field :rating
+  field :stuff
+end
 
-    @post = Post.create
-    @comment = @post.comments.create(:rating => 5, :stuff => "A")
-    @comment = @post.comments.create(:rating => 3, :stuff => "B")
-    @post.reload
-    @post.comments_count  #=> 2
-    @post.comments_rating #=> [5, 3]
-    @post.comments_stuff  #=> ["A", "B"]
+@post = Post.create
+@comment = @post.comments.create(:rating => 5, :stuff => "A")
+@comment = @post.comments.create(:rating => 3, :stuff => "B")
+@post.reload
+@post.comments_count  #=> 2
+@post.comments_rating #=> [5, 3]
+@post.comments_stuff  #=> ["A", "B"]
+```
 
 To warm up the denormalization for an existing collection:
 
-    Post.denormalize_from_comments!
+```ruby
+Post.denormalize_from_comments!
+```
 
 You can see that each denormalized field in stored in a separate array. This is wanted.
 An option `:group` will come to allow the way below (and maybe permit methods denormalization) :
 
-    @post.comments_fields #=> [{:rating => 5, :stuff => "A"}, {:rating => 5, :stuff => "B"}]
+```ruby
+@post.comments_fields #=> [{:rating => 5, :stuff => "A"}, {:rating => 5, :stuff => "B"}]
+```
 
 #### Example 2: only count
 
-    class Post
-      include Mongoid::Document
-      include Mongoid::Max::Denormalize
+```ruby
+class Post
+  include Mongoid::Document
+  include Mongoid::Max::Denormalize
 
-      has_many :comments
-      denormalize :comments, :count => true
-    end
+  has_many :comments
+  denormalize :comments, :count => true
+end
 
-    class Comment
-      include Mongoid::Document
+class Comment
+  include Mongoid::Document
 
-      belongs_to :post
-    end
+  belongs_to :post
+end
 
-    @post = Post.create
-    @comment = @post.comments.create
-    @comment = @post.comments.create
-    @post.reload
-    @post.comments_count  #=> 2
+@post = Post.create
+@comment = @post.comments.create
+@comment = @post.comments.create
+@post.reload
+@post.comments_count  #=> 2
+```
 
 
 ### Many to One
