@@ -32,7 +32,7 @@ Or install with RubyGems:
 Add `include Mongoid::Max::Denormalize` in your model and also:
 
 ```ruby
-denormalize relation, field_1, field_2 ... field_n, options
+denormalize :relation, :field_1, :field_2 ... :field_n, :options_1 => :value, :options_2 => :value
 ```
 
 
@@ -94,25 +94,22 @@ to avoid a query that checks/retrieve for the post. We want to avoid it, don't w
 
 Exemple : Check your logs, you'll see queries for the post :
 
-```ruby
-# app/views/comments/_comment.html.erb
-<div class="comment">
-  <% if @comment.post %>
-    <%= link_to @comment.post_title, @comment.post %>
-  <% end %>
-</div>
-```
+    # app/views/comments/_comment.html.erb
+    <div class="comment">
+      <% if @comment.post %>
+        <%= link_to @comment.post_title, @comment.post %>
+      <% end %>
+    </div>
 
 This is better :
 
-```ruby
-# app/views/comments/_comment.html.erb
-<div class="comment">
-  <% if @comment.post_id? %>
-    <%= link_to @comment.post_title, post_path(@comment.post_id, :slug => @comment.post_slug) %>
-  <% end %>
-</div>
-```
+    # app/views/comments/_comment.html.erb
+    <div class="comment">
+      <% if @comment.post_id? %>
+        <%= link_to @comment.post_title, post_path(@comment.post_id, :slug => @comment.post_slug) %>
+      <% end %>
+    </div>
+
 
 
 ### Many to One
@@ -191,7 +188,7 @@ end
 ```
 
 
-### Many to One
+### Many to Many
 
 To come...
 
