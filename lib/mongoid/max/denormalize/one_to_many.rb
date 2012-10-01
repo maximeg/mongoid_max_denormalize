@@ -61,7 +61,7 @@ module Mongoid
                 to_set[:"#{relation}_\#{field}"] = send(field)
               end
 
-              #{inverse_relation}.update to_set
+              #{inverse_relation}.update_all(to_set) unless to_set.empty?
             end
           EOM
 
@@ -89,7 +89,7 @@ module Mongoid
                 to_set[:"#{relation}_\#{field}"] = nil
               end
 
-              #{inverse_relation}.update(to_set) unless to_set.empty?
+              #{inverse_relation}.update_all(to_set) unless to_set.empty?
             end
           EOM
         end
