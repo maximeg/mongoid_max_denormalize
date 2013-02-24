@@ -6,21 +6,21 @@ require 'spec_helper'
 #
 # This a circular dependency between 2 models that denormalize each other.
 #
-# Building & Appartment
+# Building, Skyscraper & Appartment
 
 #
 # The specs
 #
 
-describe "Case: a building and his appartments" do
+describe "Case: a skyscraper and his appartments" do
 
   before do
-    @building = Building.create!(name: "Empire State Building")
+    @skyscraper = Skyscraper.create!(name: "Empire State Skyscraper")
   end
 
   context "when nothing" do
-    context "considering the building" do
-      subject { @building }
+    context "considering the skyscraper" do
+      subject { @skyscraper }
 
       its(:appartments) { should be_empty }
       its(:appartments_count) { should be_zero }
@@ -29,12 +29,12 @@ describe "Case: a building and his appartments" do
 
   context "when adding a first appartment" do
     before do
-      @appartment = @building.appartments.create!
-      @building.reload
+      @appartment = @skyscraper.appartments.create!
+      @skyscraper.reload
     end
 
-    context "considering the building" do
-      subject { @building }
+    context "considering the skyscraper" do
+      subject { @skyscraper }
 
       its(:appartments) { should have(1).appartment }
       its(:appartments_count) { should eq(1) }
@@ -43,23 +43,23 @@ describe "Case: a building and his appartments" do
     context "considering the appartment" do
       subject { @appartment }
 
-      its(:building_name) { should eq @building.name }
-      its(:building__type) { should eq @building._type }
+      its(:building_name) { should eq @skyscraper.name }
+      its(:building__type) { should eq @skyscraper._type }
 
-      context "when changing the building name" do
+      context "when changing the skyscraper name" do
         before do
-          @building.name = "The Great Empire State Building"
-          @building.save!
+          @skyscraper.name = "The Great Empire State Skyscraper"
+          @skyscraper.save!
           @appartment.reload
         end
 
-        its(:building_name) { should eq @building.name }
-        its(:building__type) { should eq @building._type }
+        its(:building_name) { should eq @skyscraper.name }
+        its(:building__type) { should eq @skyscraper._type }
       end
 
-      context "when destroying the building" do
+      context "when destroying the skyscraper" do
         before do
-          @building.destroy
+          @skyscraper.destroy
           @appartment.reload
         end
 
@@ -70,12 +70,12 @@ describe "Case: a building and his appartments" do
 
     context "when adding a second appartment" do
       before do
-        @appartment_2 = @building.appartments.create!
-        @building.reload
+        @appartment_2 = @skyscraper.appartments.create!
+        @skyscraper.reload
       end
 
-      context "considering the building" do
-        subject { @building }
+      context "considering the skyscraper" do
+        subject { @skyscraper }
 
         its(:appartments) { should have(2).appartment }
         its(:appartments_count) { should eq(2) }
