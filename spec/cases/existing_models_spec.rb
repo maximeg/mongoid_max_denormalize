@@ -4,41 +4,13 @@ require 'spec_helper'
 #
 # The case
 #
-class Author
-  include Mongoid::Document
+# Author, Book & Review
 
-  field :name, type: String
-
-  has_many :books
-end
-
-class Book
-  include Mongoid::Document
-  include Mongoid::Max::Denormalize
-
-  field :name, type: String
-
-  def slug
-    name.try(:parameterize)
-  end
-
-  belongs_to :author
-
-  has_many :reviews
-end
-
-class Review
-  include Mongoid::Document
-  include Mongoid::Max::Denormalize
-
-  belongs_to :book
-
-  field :rating, type: Integer
-end
 
 def reload!
   [@author, @book, @review_1, @review_2].each(&:reload)
 end
+
 
 #
 # The specs
@@ -101,4 +73,3 @@ describe "Case: Existing models" do
   end
 
 end
-

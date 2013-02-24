@@ -4,25 +4,8 @@ require 'spec_helper'
 #
 # The case
 #
-class Contact
-  include Mongoid::Document
+# Contact, Person & Address
 
-  field :name, type: String
-
-  has_many :addresses
-end
-
-class Person < Contact
-end
-
-class Address
-  include Mongoid::Document
-  include Mongoid::Max::Denormalize
-
-  belongs_to :contact
-
-  denormalize :contact, :name
-end
 
 #
 # The specs
@@ -56,6 +39,7 @@ describe "Case: a contact and his addresses" do
       subject { @address }
 
       its(:contact_name) { should eq @person.name }
+      its(:contact__type) { should eq @person._type }
 
       context "when changing the person name" do
         before do
@@ -65,6 +49,7 @@ describe "Case: a contact and his addresses" do
         end
 
         its(:contact_name) { should eq @person.name }
+        its(:contact__type) { should eq @person._type }
       end
 
       context "when destroying the person" do
@@ -74,9 +59,9 @@ describe "Case: a contact and his addresses" do
         end
 
         its(:contact_name) { should be_nil }
+        its(:contact__type) { should be_nil }
       end
     end
   end
 
 end
-

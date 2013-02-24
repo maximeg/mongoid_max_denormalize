@@ -4,23 +4,8 @@ require 'spec_helper'
 #
 # The case
 #
-# This is to demonstrate when we denormalize a Many to One
-# with no fields and only an option :count => true
-#
-class Inhabitant
-  include Mongoid::Document
+# City & Inhabitant
 
-  belongs_to :city
-end
-
-class City
-  include Mongoid::Document
-  include Mongoid::Max::Denormalize
-
-  has_many :inhabitants
-
-  denormalize :inhabitants, count: true
-end
 
 
 #
@@ -89,4 +74,3 @@ describe "Case: a city and his inhabitants" do
   end
 
 end
-

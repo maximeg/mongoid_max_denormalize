@@ -4,25 +4,7 @@ require 'spec_helper'
 #
 # The case
 #
-class Rating
-  include Mongoid::Document
-
-  field :note, type: Integer
-  field :comment, type: String
-  field :upset_level, type: Integer
-
-  belongs_to :song
-end
-
-class Song
-  include Mongoid::Document
-  include Mongoid::Max::Denormalize
-
-  has_many :ratings
-
-  #denormalize :ratings, :note, :comment, count: true, mean: [:note]
-  denormalize :ratings, :note, :comment, :upset_level, count: true
-end
+# Rating & Song
 
 
 #
@@ -215,4 +197,3 @@ describe "Case: a song and his ratings" do
   end
 
 end
-

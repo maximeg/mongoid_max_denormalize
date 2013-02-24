@@ -4,6 +4,30 @@ require 'rspec'
 require 'mongoid'
 require 'mongoid_max_denormalize'
 
+#
+# Fake App
+#
+MODELS = File.join(File.dirname(__FILE__), "app/models")
+$LOAD_PATH.unshift(MODELS)
+
+# Autoload every model for the test suite that sits in spec/app/models.
+Dir[ File.join(MODELS, "*.rb") ].sort.each do |file|
+  name = File.basename(file, ".rb")
+  autoload name.camelize.to_sym, name
+end
+
+module Rails
+  class Application
+  end
+end
+
+module MyApp
+  class Application < Rails::Application
+  end
+end
+
+
+
 # Are we in presence of Mongoid 3
 def mongoid3
   Mongoid::VERSION =~ /\A3\./
@@ -62,4 +86,3 @@ RSpec.configure do |config|
   end
 
 end
-
